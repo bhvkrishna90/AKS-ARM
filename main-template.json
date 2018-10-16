@@ -1,0 +1,205 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "aks-cluster-name": {
+            "type":  "string",
+            "defaultValue": "krishcluster",
+            "metadata": {
+                "description" : "Enter AKS Cluster Name"
+            }
+        },
+        "adminusername" : {
+            "type": "string",
+            "defaultValue": "adminuser",
+            "metadata": {
+                "description" : "Enter adminuser name to login"
+            }
+        },
+        "dnsprefix" : {
+            "type": "string",
+            "defaultValue": "krishk8s",
+            "metadata": {
+                "description": "Enter dns prefix for the cluster"
+            }
+        },
+        "sshRSAPublicKey": {
+            "type": "string",
+            "metadata": {
+                "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
+            }
+        },
+        "servicePrincipalClientId": {
+            "metadata": {
+              "description": "Client ID (used by cloudprovider)"
+            },
+            "type": "securestring"
+          },
+          "servicePrincipalClientSecret": {
+            "metadata": {
+              "description": "The Service Principal Client Secret."
+            },
+            "type": "securestring"
+          },
+          "kubernetesVersion": {
+            "type": "string",
+            "defaultValue": "1.11.3",
+            "allowedValues": [
+                "1.7.15",
+                "1.7.16",
+                "1.8.14",
+                "1.8.15",
+                "1.9.9",
+                "1.9.10",
+                "1.10.7",
+                "1.10.8",
+                "1.11.2",
+                "1.11.3"
+            ],
+            "metadata": {
+              "description": "The version of Kubernetes."
+            }
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "defaultValue": "Standard_A2",
+            "allowedValues": [
+                "Standard_A10",
+                "Standard_A11",
+                "Standard_A2",
+                "Standard_A2_v2",
+                "Standard_A2m_v2",
+                "Standard_A3",
+                "Standard_A4",
+                "Standard_A4_v2",
+                "Standard_A4m_v2",
+                "Standard_A5",
+                "Standard_A6",
+                "Standard_A7",
+                "Standard_A8",
+                "Standard_A8_v2",
+                "Standard_A8m_v2",
+                "Standard_A9",
+                "Standard_D11",
+                "Standard_D11_v2",
+                "Standard_D12",
+                "Standard_D12_v2",
+                "Standard_D13",
+                "Standard_D13_v2",
+                "Standard_D14",
+                "Standard_D14_v2",
+                "Standard_D15_v2",
+                "Standard_D2",
+                "Standard_D2_v2",
+                "Standard_D3",
+                "Standard_D3_v2",
+                "Standard_D4",
+                "Standard_D4_v2",
+                "Standard_D5_v2",
+                "Standard_DS11",
+                "Standard_DS11_v2",
+                "Standard_DS12",
+                "Standard_DS12_v2",
+                "Standard_DS13",
+                "Standard_DS13_v2",
+                "Standard_DS14",
+                "Standard_DS14_v2",
+                "Standard_DS15_v2",
+                "Standard_DS2",
+                "Standard_DS2_v2",
+                "Standard_DS3",
+                "Standard_DS3_v2",
+                "Standard_DS4",
+                "Standard_DS4_v2",
+                "Standard_DS5_v2",
+                "Standard_F16",
+                "Standard_F16s",
+                "Standard_F2",
+                "Standard_F2s",
+                "Standard_F4",
+                "Standard_F4s",
+                "Standard_F8",
+                "Standard_F8s",
+                "Standard_G1",
+                "Standard_G2",
+                "Standard_NC6",
+                "Standard_NC12",
+                "Standard_NC24",
+                "Standard_NC24r",
+                "Standard_NV6",
+                "Standard_NV12",
+                "Standard_NV24"
+              ],
+              "metadata": {
+                "description": "The size of the Virtual Machine."
+              }
+        }
+    },
+    "variables": {
+        "resourceGroupName": "[resourceGroup().name]",
+        "location": "[resourceGroup().location]",
+        "suffix": "[substring(uniqueString(resourceGroup().id), 0, 5)]",
+        "virtualMachineSize" : "[parameters('virtualMachineSize')]",
+        "osType" : "Linux",
+        "maxpods" : "30",
+        "agentCount" : "1",
+        "osDiskSizeGB" : "30",
+        "enableHttpApplicationRouting" : "true"
+    },
+    "resources": [
+            {
+              "type": "Microsoft.ContainerService/managedClusters",
+              "apiVersion": "2018-03-31",
+              "name": "[concat(parameters('aks-cluster-name'),variables('suffix'))]",
+              "location": "[variables('location')]",
+              "dependsOn": [],
+              "properties": {
+                "kubernetesVersion": "[parameters('kubernetesVersion')]",
+                "dnsPrefix": "[parameters('dnsprefix')]",
+                "addonProfiles": {
+                    "httpApplicationRouting": {
+                      "enabled": "[variables('enableHttpApplicationRouting')]"
+                    }
+                },
+                "agentPoolProfiles": [
+                  {
+                    "name": "[concat('agentpool', variables('suffix'))]",
+                    "osDiskSizeGB": "[variables('osDiskSizeGB')]",
+                    "count": "[variables('agentCount')]",
+                    "vmSize": "[variables('virtualMachineSize')]",
+                    "osType": "[variables('osType')]",
+                    "maxPods": "[variables('maxPods')]",
+                    "storageProfile": "ManagedDisks"
+                  }
+                ],
+                "linuxProfile": {
+                  "adminUsername": "[parameters('adminUsername')]",
+                  "ssh": {
+                    "publicKeys": [
+                      {
+                        "keyData": "[parameters('sshRSAPublicKey')]"
+                      }
+                    ]
+                  }
+                },
+                "servicePrincipalProfile": {
+                    "clientId": "[parameters('servicePrincipalClientId')]",
+                    "Secret": "[parameters('servicePrincipalClientSecret')]"
+                }
+              }
+           }        
+    ],
+    "outputs": {
+        "AKS": {
+            "type": "object",
+            "value": "[reference(concat('Microsoft.ContainerService/managedClusters/', variables('resourceGroupName')))]"
+        },
+        "controlPlaneFQDN": {
+
+            "type": "string",
+
+            "value": "[reference(parameters('aks-cluster-name')).fqdn]"
+
+        }
+    }
+}
