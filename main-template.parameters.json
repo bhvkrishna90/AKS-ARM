@@ -1,0 +1,30 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+        "aks-cluster-name": {
+			"value": "GEN-UNIQUE"
+        },
+        "adminusername": {
+            "value": "adminuser"
+        },
+		"dnsPrefix": {
+			"value": "GEN-UNIQUE"
+        },
+        "sshRSAPublicKey": {
+			"value": "GEN-SSH-PUB-KEY"
+		},
+		"servicePrincipalClientId": {
+			"value": "GEN-GUID"
+		},
+		"servicePrincipalClientSecret": {
+			"value": "GEN-UNIQUE"
+        },
+        "kubernetesVersion": {
+            "value": "1.11.3"
+        },
+        "virtualMachineSize": {
+            "value": "Standard_A2"
+        }
+	}
+}
