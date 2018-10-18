@@ -2,29 +2,50 @@
 	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
 	"contentVersion": "1.0.0.0",
 	"parameters": {
-        "aks-cluster-name": {
+        "resourcename": {
 			"value": "GEN-UNIQUE"
         },
-        "adminusername": {
-            "value": "adminuser"
+        "location": {
+            "value": "eastus"
         },
-		"dnsPrefix": {
-			"value": "GEN-UNIQUE"
+	    "dnsPrefix": {
+	        "value": "GEN-UNIQUE"
         },
-        "sshRSAPublicKey": {
-			"value": "GEN-SSH-PUB-KEY"
-		},
-		"servicePrincipalClientId": {
+        "osDiskSizeGB" : {
+            "value" : "30"
+        },
+        "agentCount" : {
+            "value" : "1"
+        }
+        "agentVMSize" : {
+            "value" : "Standard_A2"
+        }
+        "servicePrincipalClientId": {
 			"value": "GEN-GUID"
 		},
 		"servicePrincipalClientSecret": {
 			"value": "GEN-UNIQUE"
         },
+        "sshRSAPublicKey": {
+			"value": "GEN-SSH-PUB-KEY"
+		},
+		"osType" : {
+            "value" : "linux"
+        },
         "kubernetesVersion": {
             "value": "1.11.3"
         },
-        "virtualMachineSize": {
-            "value": "Standard_A2"
+        "enableHttpApplicationRouting": {
+            "value": "true"
+        },
+        "networkPlugin" : {
+            "value" : "azure"
+        },
+         "maxPods": {
+            "value": 30,
+        },
+        "enableRBAC": {
+            "value": true,
         }
 	}
 }
