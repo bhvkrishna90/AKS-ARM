@@ -16,10 +16,10 @@
         },
         "agentCount" : {
             "value" : "1"
-        }
+        },
         "agentVMSize" : {
             "value" : "Standard_A2"
-        }
+        },
         "servicePrincipalClientId": {
 			"value": "GEN-GUID"
 		},
@@ -42,10 +42,10 @@
             "value" : "azure"
         },
          "maxPods": {
-            "value": 30,
+            "value": 30
         },
         "enableRBAC": {
-            "value": true,
+            "value": true
         }
 	}
 }
